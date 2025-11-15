@@ -90,6 +90,50 @@ app.delete('/todos/:id', (req, res) => {
   });
 });
 
+// bu patch yani todoni yangilaydi
+
+app.patch('/todos/:id', (req, res) => {
+  let todoId = Number(req.params.id);
+
+  //   todoni topamz
+  let todo = todos.find((t) => t.id === todoId);
+  //   todo topilmasa
+  if (!todo) {
+    return res.status(404).json({ message: 'Todo topilmadi' });
+  }
+
+  // Bodydan kelgan malumotlarni olamiz
+  const { title, completed } = req.body;
+
+  // === TITLE VALIDATSIYA ===
+  if (title !== undefined) {
+    const cleanedTitle = title.trim();
+
+    if (cleanedTitle.length === 0) {
+      return res
+        .status(400)
+        .json({ message: 'Title bo‘sh bo‘lishi mumkin emas' });
+    }
+
+    todo.title = cleanedTitle;
+  }
+
+  // === COMPLETED VALIDATSIYA ===
+  if (completed !== undefined) {
+    if (typeof completed !== 'boolean') {
+      return res
+        .status(400)
+        .json({ message: 'Completed faqat true/false bo‘lishi kerak' });
+    }
+    todo.completed = completed;
+  }
+
+  res.json({
+    message: 'Todo muvaffaqiyatli yangilandi',
+    updatedTodo: todo,
+  });
+});
+
 // serverni ishga tushurish
 
 app.listen(PORT, () => {
